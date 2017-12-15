@@ -25,9 +25,12 @@ import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.perl5.lang.perl.psi.*;
 import com.perl5.lang.perl.psi.utils.PerlResolveUtil;
+import com.perl5.lang.perl.psi.stubs.subsdefinitions.PerlSubNameDefinitionsIndex;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by hurricup on 05.06.2015.
@@ -39,6 +42,8 @@ public class PerlGotoDeclarationHandler implements GotoDeclarationHandler {
     if (sourceElement == null) {
       return null;
     }
+
+    Project project = sourceElement.getProject();
 
     int offsetInElement = offset - sourceElement.getNode().getStartOffset();
 
@@ -94,7 +99,6 @@ public class PerlGotoDeclarationHandler implements GotoDeclarationHandler {
     // string content to file jump fixme change to string
     else if (sourceElement instanceof PerlStringContentElement && ((PerlStringContentElement)sourceElement).looksLikePath()) {
       String tokenText = ((PerlStringContentElement)sourceElement).getContinuosText().replaceAll("\\\\", "/").replaceAll("/+", "/");
-      Project project = sourceElement.getProject();
 
       String fileName = ((PerlStringContentElement)sourceElement).getContentFileName();
 
@@ -124,6 +128,13 @@ public class PerlGotoDeclarationHandler implements GotoDeclarationHandler {
           }
         }
       }
+    }
+
+    // Add functions with same name if nothing found
+    if ( (sourceElement instanceof PerlSubNameElement) && result.isEmpty() ) {
+      String sourceElementName = ((PerlSubNameElement)sourceElement).getName();
+        Collection<PerlSubDefinitionElement> declarations = PerlSubNameDefinitionsIndex.find(sourceElementName, project);
+        result.addAll(declarations);
     }
 
     return result.isEmpty() ? null : result.toArray(new PsiElement[result.size()]);

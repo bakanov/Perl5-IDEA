@@ -77,6 +77,7 @@ public class PerlSubDefinitionElementType extends IStubElementType<PerlSubDefini
   public void indexStub(@NotNull PerlSubDefinitionStub stub, @NotNull IndexSink sink) {
     sink.occurrence(getDirectKey(), stub.getCanonicalName());
     sink.occurrence(getReverseKey(), stub.getPackageName());
+    sink.occurrence(getNameKey(), stub.getSubName());
   }
 
   protected StubIndexKey<String, ? extends PsiElement> getDirectKey() {
@@ -85,6 +86,10 @@ public class PerlSubDefinitionElementType extends IStubElementType<PerlSubDefini
 
   protected StubIndexKey<String, ? extends PsiElement> getReverseKey() {
     return PerlSubDefinitionReverseIndex.KEY;
+  }
+
+  protected StubIndexKey<String, ? extends PsiElement> getNameKey() {
+    return PerlSubNameDefinitionsIndex.KEY;
   }
 
   @Override
